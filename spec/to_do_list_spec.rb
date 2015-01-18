@@ -1,6 +1,14 @@
 require('rspec')
 require('to_do_list')
 
+DB = PG.connect({:dbname => 'to_do_test'})
+
+RSpec.configure do |config|
+  config.after(:each) do
+    DB.exec("DELETE FROM tasks *;")
+  end
+end
+
 describe(ToDoList) do
   before() do
     ToDoList.clear()
