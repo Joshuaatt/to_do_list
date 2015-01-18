@@ -1,21 +1,24 @@
 class ToDoList
-  @@all_tasks = []
-  define_method(:initialize) do |description|
-    @description = description
-  end
 
-  define_method(:description) do
-    @description
+  attr_reader(:description)
+
+  define_method(:initialize) do |attributes|
+    @description = attributes.fetch(:description)
   end
 
   define_singleton_method(:all) do
-    @@all_tasks
+    returned_tasks = DB.exec("SELECT * FROM tasks;")
+    tasks = []
+    returned_tasks.each() do |task|
+      description = task.fetch("description")
+      tasks.push(ToDoList.new({:description => description}))
+    end
+    tasks
   end
-
+  define_method(:==) do |another_task|
+    self.description().==(another_task.description())
+  end
   define_method(:save) do
-    @@all_tasks.push(self)
-  end
-  define_singleton_method(:clear) do
-    @@all_tasks = []
+    DB.exec("INSERT INTO tasks (description) VALUES ('#{@description}')")
   end
 end
